@@ -1,0 +1,88 @@
+<h1 class="text-3xl font-bold mt-12">Subscribe</h1>
+
+<%= @price.product.name %>
+
+<%= number_to_currency(@price.unit_amount/100) %> / <%= @price.recurring.interval %>
+
+<form id="subscription-form">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+  <fieldset class="mt-2">
+    <legend class="sr-only">Card</legend>
+    <div class="divide-y divide-gray-200">
+      <% @payment_methods.each do |pm| %>
+      <div class="relative flex items-start py-4">
+        <div class="min-w-0 flex-1 text-sm">
+          <label for="account-checking" class="font-medium text-gray-700"><%= pm.id %></label>
+          <p id="account-checking-description" class="text-gray-500">
+            <%= pm.card.brand.upcase %> ••••<%= pm.card.last4 %>
+          </p>
+        </div>
+        <div class="ml-3 flex h-5 items-center">
+          <input name="payment_method" type="radio" value="<%= pm.id %>" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+        </div>
+      </div>
+      <% end %>
+      <div class="relative flex items-start py-4">
+        <div class="min-w-0 flex-1">
+          <div id="payment-element"></div>
+        </div>
+        <div class="ml-3 flex h-5 items-center">
+          <% if @payment_methods.any? %>
+          <input id="payment-element-box" name="payment_method" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+
+
+  <button type="submit" class="mt-4 line-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+    Subscribe
+  </button>
+</form>
+
+<script>
+  const stripe = Stripe('pk_test_vAZ3gh1LcuM7fW4rKNvqafgB00DR9RKOjN');
+
+  const options = {
+    clientSecret: '<%= @subscription.latest_invoice.payment_intent.client_secret %>',
+  };
+
+  // Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in step 3
+  const elements = stripe.elements(options);
+
+  // Create and mount the Payment Element
+  const paymentElement = elements.create('payment');
+  paymentElement.mount('#payment-element');
+
+  const paymentElementCheckbox = document.getElementById('payment-element-box');
+
+  const form = document.getElementById('subscription-form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if(!paymentElementCheckbox || paymentElementCheckbox.checked) {
+      const {error} = stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: '<%= subscriptions_url %>',
+        }
+      })
+      if(error) {
+        alert(error.message);
+      }
+    } else {
+      const paymentMethod = document.querySelector("input[name='payment_method']:checked").value;
+      const {paymentIntent, error} = await stripe.confirmCardPayment(options.clientSecret, {
+        payment_method: paymentMethod,
+      })
+      if(error) {
+        alert(error.message);
+      } else {
+        window.location.href = "/subscriptions"
+      }
+    }
+  })
+</script>

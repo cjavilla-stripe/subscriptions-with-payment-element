@@ -71,3 +71,7 @@ end
 
 
 gem "stripe", "~> 7.1"
+
+gem "devise", "~> 4.8"
+
+gem "annotate", "~> 3.2"

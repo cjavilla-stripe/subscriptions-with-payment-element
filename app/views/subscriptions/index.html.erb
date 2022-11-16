@@ -1,0 +1,31 @@
+<h1 class="text-3xl font-bold mt-12">Subscriptions</h1>
+
+<div class="overflow-hidden bg-white shadow sm:rounded-md mt-4">
+  <ul role="list" class="divide-y divide-gray-200">
+    <% @subscriptions.each do |subscription| %>
+    <li>
+      <div class="px-4 py-4 sm:px-6">
+        <div class="flex items-center justify-between">
+          <p class="truncate text-sm font-medium text-indigo-600">
+            <a href="https://dashboard.stripe.com/test/subscriptions/<%= subscription.stripe_subscription_id %>" target="_blank" class="underline">
+              <%= subscription.stripe_subscription_id %>
+            </a>
+          </p>
+        </div>
+        <div class="mt-2 sm:flex sm:justify-between">
+          <div>
+            <%= subscription.stripe_subscription_status %>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+            <!-- Heroicon name: mini/calendar -->
+            <p>
+              Created
+              <time datetime="2020-01-07"><%= time_ago_in_words(subscription.created_at) %> ago.</time>
+            </p>
+          </div>
+        </div>
+      </div>
+    </li>
+    <% end %>
+  </ul>
+</div>

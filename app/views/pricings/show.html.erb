@@ -1,7 +1,8 @@
 <% if @prices.empty? %>
 <p>No products yet.</a></p>
 <% end %>
-<% @prices.each do |price| %>
+<div class="grid grid-cols-3 mt-12">
+  <% @prices.each do |price| %>
   <div>
     <div>
       <!-- <img src="<%= price.product.images.try(:first) %>" alt="<%= price.product.description %>"> -->
@@ -11,14 +12,14 @@
       <p><%= price.product.description %></p>
     </div>
     <div>
-      <div aria-hidden="true" class="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black opacity-50"></div>
       <p><%= number_to_currency(price.unit_amount/100, precision: 0) %></p>
     </div>
-    <form action="/checkout" method="post" data-remote="true">
-      <input type="hidden" name="price" value="<%= price.id %>">
-      <button type="submit" class="line-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+    <div class="mt-4">
+      <a href="/subscriptions/new?price=<%= price.id %>" class="mt-4 line-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
         Subscribe to <%= price.product.name %>
-      </button>
+      </a>
+    </div>
     </form>
   </div>
-<% end %>
+  <% end %>
+</div>

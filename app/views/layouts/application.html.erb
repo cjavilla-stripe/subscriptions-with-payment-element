@@ -8,10 +8,21 @@
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    <script src="https://js.stripe.com/v3/"></script>
   </head>
 
   <body>
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <%= flash[:alert] %>
+      <%= flash[:notice] %>
+      <% if !user_signed_in? %>
+        <a href="/users/sign_up" class="underline">Sign up</a>
+        <a href="/users/sign_in" class="underline">Log in</a>
+      <% else %>
+        <a href="/users/sign_out" class="underline">Sign out</a>
+        <%= current_user.email %>
+        <%= current_user.stripe_customer_id %>
+      <% end %>
       <%= yield %>
     </div>
   </body>
